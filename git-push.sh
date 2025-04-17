@@ -29,11 +29,13 @@ if [ ! -d .git ]; then
     echo "Git repository initialized"
 fi
 
-# 添加文件到暂存区
-git add zhihu.js
+# 添加所有文件到暂存区（替换原来只添加 zhihu.js 的逻辑）
+git add .
 
 # 提交更改
-git commit -m "Update: 知乎文章阅读优化脚本"
+read -p "请输入提交信息 (默认: Update files): " commit_msg
+commit_msg=${commit_msg:-"Update files"}
+git commit -m "$commit_msg"
 
 # 如果还没有设置远程仓库，需要先设置
 if ! git remote | grep -q '^origin$'; then

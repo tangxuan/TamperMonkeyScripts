@@ -2,15 +2,24 @@
 
 # 设置代理函数
 setup_proxy() {
-    git config --global http.proxy http://127.0.0.1:33210
-    git config --global https.proxy http://127.0.0.1:33210
-    echo "代理已设置为 http://127.0.0.1:33210"
+    local proxy_addr=${1:-"http://127.0.0.1:33210"}
+    git config --global http.proxy "$proxy_addr"
+    git config --global https.proxy "$proxy_addr"
+    echo "代理已设置为 $proxy_addr"
 }
 
 # 检查代理连接
 check_proxy() {
-    curl -x http://127.0.0.1:33210 -I https://github.com -s -m 5
+    # 增加超时时间，添加详细输出
+    curl -v -x $(git config --global --get http.proxy) -I https://github.com -s -m 10
     return $?
+}
+
+# 清除代理设置
+clear_proxy() {
+    git config --global --unset http.proxy
+    git config --global --unset https.proxy
+    echo "已清除代理设置"
 }
 
 # 检查网络连接
@@ -63,6 +72,34 @@ git remote add origin https://github.com/tangxuan/TamperMonkeyScripts.git
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 if [ -z "$current_branch" ]; then
     current_branch="master"  # 默认使用 master
+fi
+
+# 在推送之前添加代理检查和配置
+echo "正在验证代理连接..."
+if ! check_proxy; then
+    echo "当前代理无法连接，是否要："
+    echo "1) 重试当前代理"
+    echo "2) 输入新的代理地址"
+    echo "3) 清除代理设置"
+    read -p "请选择 (1/2/3): " proxy_choice
+    
+    case $proxy_choice in
+        1)
+            setup_proxy
+            ;;
+        2)
+            read -p "请输入代理地址 (格式: http://ip:port): " new_proxy
+            setup_proxy "$new_proxy"
+            ;;
+        3)
+            clear_proxy
+            ;;
+    esac
+    
+    if ! check_proxy; then
+        echo "代理设置失败，请手动检查网络配置"
+        exit 1
+    fi
 fi
 
 # 推送到 GitHub，添加错误处理
