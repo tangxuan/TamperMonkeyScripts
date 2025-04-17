@@ -1,0 +1,11 @@
+# Git 相关脚本
+*git-*.sh
+git-init.sh
+git-push.sh
+
+# 其他常见需要忽略的文件
+.DS_Store
+node_modules/
+*.log
+# Git 相关脚本
+git-*.sh
