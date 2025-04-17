@@ -25,14 +25,26 @@ git add .
 # 第一次提交
 git commit -m "Initial commit: 添加知乎文章阅读优化脚本"
 
+# 检查并删除已存在的远程仓库
+if git remote | grep -q '^origin$'; then
+    git remote remove origin
+    echo "已移除现有的远程仓库"
+fi
+
 # 添加远程仓库
 git remote add origin https://github.com/tangxuan/TamperMonkeyScripts.git
+
+# 获取当前分支名
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+if [ -z "$current_branch" ]; then
+    current_branch="master"  # 默认使用 master
+fi
 
 # 推送到 GitHub，添加错误处理
 MAX_RETRIES=3
 retry_count=0
 while [ $retry_count -lt $MAX_RETRIES ]; do
-    git push -u origin main
+    git push -u origin $current_branch
     if [ $? -eq 0 ]; then
         echo "成功推送到 GitHub"
         break
@@ -42,10 +54,8 @@ while [ $retry_count -lt $MAX_RETRIES ]; do
             echo "推送失败，5秒后重试... ($retry_count/$MAX_RETRIES)"
             sleep 5
         else
-            echo "推送失败，请检查网络连接和代理设置"
-            echo "当前代理设置："
-            git config --global --get http.proxy
-            git config --global --get https.proxy
+            echo "推送失败，请尝试手动执行以下命令："
+            echo "git push -u origin $current_branch"
             exit 1
         fi
     fi
