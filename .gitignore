@@ -1,5 +1,5 @@
 # Git 相关脚本
-git-*.sh
+*git-*.sh
 git-init.sh
 git-push.sh
 
@@ -7,3 +7,5 @@ git-push.sh
 .DS_Store
 node_modules/
 *.log
+# Git 相关脚本
+git-*.sh
