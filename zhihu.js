@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      2025-04-17
 // @description  优化知乎文章页面的阅读体验，调整页面宽度和行间距
-// @author       You
+// @author       You & me
 // @match        https://zhuanlan.zhihu.com/*
 // @icon         https://static.zhihu.com/heifetz/favicon.ico
 // @grant        none
