@@ -1,0 +1,63 @@
+// ==UserScript==
+// @name         Enhance English Reading Experience
+// @namespace    http://tampermonkey.net/
+// @version      0.2
+// @description  Add spaces after commas and periods in <p> tags for better English reading experience
+// @author       Dragontx
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?domain=example.com
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 缓存已处理的p标签，标签页级
+    const enhancedSet = new Set();
+
+    function enhanceParagraphs() {
+        const paragraphs = document.querySelectorAll('p');
+        // console.log('[EnhanceEnglish] 检测到', paragraphs.length, '个<p>标签');
+        let enhancedCount = 0;
+        paragraphs.forEach(p => {
+            if (!enhancedSet.has(p)) {
+                let html = p.innerHTML;
+                // 使用 &nbsp; 替代普通空格，防止浏览器合并
+                const nbsp3 = '&nbsp;&nbsp;&nbsp;';
+                const nbsp7 = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                const newHtml = html.replace(/,/g, ',' + nbsp3).replace(/\./g, '.' + nbsp7);
+                if (html !== newHtml) {
+                    p.innerHTML = newHtml;
+                    enhancedCount++;
+                }
+                enhancedSet.add(p);
+            }
+        });
+        // console.log('[EnhanceEnglish] 本次处理新增', enhancedCount, '个<p>');
+    }
+
+    // 延迟加载文本的处理
+    let scrollTimeout = null;
+    function onScroll() {
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            // console.log('[EnhanceEnglish] 触发滚动增量处理');
+            enhanceParagraphs();
+        }, 300);
+    }
+
+    // 页面加载后处理一次
+    window.addEventListener('DOMContentLoaded', () => {
+        // console.log('[EnhanceEnglish] DOMContentLoaded');
+        enhanceParagraphs();
+    });
+    // 监听滚动事件，增量处理新出现的p标签
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // 监听DOM变动（如SPA、异步加载）
+    const observer = new MutationObserver(() => {
+        // console.log('[EnhanceEnglish] MutationObserver触发');
+        enhanceParagraphs();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
