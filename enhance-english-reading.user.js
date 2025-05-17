@@ -22,15 +22,18 @@
         let enhancedCount = 0;
         paragraphs.forEach(p => {
             if (!enhancedSet.has(p)) {
-                let html = p.innerHTML;
-                // 使用 &nbsp; 替代普通空格，防止浏览器合并
-                const nbsp3 = '&nbsp;&nbsp;&nbsp;';
-                const nbsp7 = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                const newHtml = html.replace(/,/g, ',' + nbsp3).replace(/\./g, '.' + nbsp7);
-                if (html !== newHtml) {
-                    p.innerHTML = newHtml;
-                    enhancedCount++;
+                // 只处理纯文本节点，保留标签结构
+                function processNode(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        // 替换英文逗号和句号后的空格
+                        const nbsp3 = '\u00A0\u00A0\u00A0';
+                        const nbsp7 = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
+                        node.textContent = node.textContent.replace(/,/g, ',' + nbsp3).replace(/\./g, '.' + nbsp7);
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        node.childNodes.forEach(processNode);
+                    }
                 }
+                p.childNodes.forEach(processNode);
                 enhancedSet.add(p);
             }
         });
