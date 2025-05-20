@@ -25,10 +25,15 @@
                 // 只处理纯文本节点，保留标签结构
                 function processNode(node) {
                     if (node.nodeType === Node.TEXT_NODE) {
-                        // 替换英文逗号和句号后的空格
+                        // 替换英文逗号和句号后的空格，但跳过数字中的逗号和句号
                         const nbsp3 = '\u00A0\u00A0\u00A0';
                         const nbsp7 = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
-                        node.textContent = node.textContent.replace(/,/g, ',' + nbsp3).replace(/\./g, '.' + nbsp7);
+                        let text = node.textContent;
+                        // 处理非数字之间的逗号
+                        text = text.replace(/([^0-9]),(?!\s*[0-9])/g, '$1,' + nbsp3);
+                        // 处理非数字之间的句号
+                        text = text.replace(/([^0-9])\.(?!\s*[0-9])/g, '$1.' + nbsp7);
+                        node.textContent = text;
                     } else if (node.nodeType === Node.ELEMENT_NODE) {
                         node.childNodes.forEach(processNode);
                     }
