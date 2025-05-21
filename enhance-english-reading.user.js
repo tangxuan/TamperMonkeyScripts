@@ -6,13 +6,7 @@
 // @author       Dragontx
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?domain=example.com
-// @match        https://arxiv.org/*
-// @match        https://ieeexplore.ieee.org/*
-// @match        https://www.sciencedirect.com/*
-// @match        https://medium.com/*
-// @match        https://towardsdatascience.com/*
-// @match        https://stackoverflow.com/*
-// @match        https://dev.to/*
+// @match        *://*/*
 // @grant        none
 // ==/UserScript==
 
